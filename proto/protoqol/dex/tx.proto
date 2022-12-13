@@ -1,13 +1,55 @@
 syntax = "proto3";
 package protoqol.dex;
 
+import "protoqol/dex/pool.proto";
 // this line is used by starport scaffolding # proto/tx/import
+import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
 
 option go_package = "protoqol/x/dex/types";
 
 // Msg defines the Msg service.
 service Msg {
-    // this line is used by starport scaffolding # proto/tx/rpc
+    rpc CreatePool(MsgCreatePool) returns (MsgCreatePoolResponse);
+  rpc UpdatePool(MsgUpdatePool) returns (MsgUpdatePoolResponse);
+  rpc DeletePool(MsgDeletePool) returns (MsgDeletePoolResponse);
+  rpc AddLiquidity(MsgAddLiquidity) returns (MsgAddLiquidityResponse);
+// this line is used by starport scaffolding # proto/tx/rpc
+}
+
+message MsgCreatePool {
+  string creator = 1;
+  cosmos.base.v1beta1.Coin amount = 2 [(gogoproto.nullable) = false];
+  int32 height = 3;
+}
+
+message MsgCreatePoolResponse {
+  uint64 id = 1;
+}
+
+message MsgUpdatePool {
+  string creator = 1;
+  uint64 id = 2;
+  cosmos.base.v1beta1.Coin amount = 3 [(gogoproto.nullable) = false];
+  int32 height = 4;
+}
+
+message MsgUpdatePoolResponse {}
+
+message MsgDeletePool {
+  string creator = 1;
+  uint64 id = 2;
+}
+
+message MsgDeletePoolResponse {}
+
+message MsgAddLiquidity {
+  string creator = 1;
+  cosmos.base.v1beta1.Coin amount = 2 [(gogoproto.nullable) = false];
+  string denom = 3;
+}
+
+message MsgAddLiquidityResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message

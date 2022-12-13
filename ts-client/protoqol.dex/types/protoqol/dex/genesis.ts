@@ -1,20 +1,22 @@
 /* eslint-disable */
+import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Params } from "./params";
+import { Pool } from "./pool";
 
 export const protobufPackage = "protoqol.dex";
 
 /** GenesisState defines the dex module's genesis state. */
 export interface GenesisState {
-  params:
-    | Params
-    | undefined;
-  /** this line is used by starport scaffolding # genesis/proto/state */
+  params: Params | undefined;
   portId: string;
+  poolList: Pool[];
+  /** this line is used by starport scaffolding # genesis/proto/state */
+  poolCount: number;
 }
 
 function createBaseGenesisState(): GenesisState {
-  return { params: undefined, portId: "" };
+  return { params: undefined, portId: "", poolList: [], poolCount: 0 };
 }
 
 export const GenesisState = {
@@ -24,6 +26,12 @@ export const GenesisState = {
     }
     if (message.portId !== "") {
       writer.uint32(18).string(message.portId);
+    }
+    for (const v of message.poolList) {
+      Pool.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.poolCount !== 0) {
+      writer.uint32(32).uint64(message.poolCount);
     }
     return writer;
   },
@@ -41,6 +49,12 @@ export const GenesisState = {
         case 2:
           message.portId = reader.string();
           break;
+        case 3:
+          message.poolList.push(Pool.decode(reader, reader.uint32()));
+          break;
+        case 4:
+          message.poolCount = longToNumber(reader.uint64() as Long);
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -53,6 +67,8 @@ export const GenesisState = {
     return {
       params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
       portId: isSet(object.portId) ? String(object.portId) : "",
+      poolList: Array.isArray(object?.poolList) ? object.poolList.map((e: any) => Pool.fromJSON(e)) : [],
+      poolCount: isSet(object.poolCount) ? Number(object.poolCount) : 0,
     };
   },
 
@@ -60,6 +76,12 @@ export const GenesisState = {
     const obj: any = {};
     message.params !== undefined && (obj.params = message.params ? Params.toJSON(message.params) : undefined);
     message.portId !== undefined && (obj.portId = message.portId);
+    if (message.poolList) {
+      obj.poolList = message.poolList.map((e) => e ? Pool.toJSON(e) : undefined);
+    } else {
+      obj.poolList = [];
+    }
+    message.poolCount !== undefined && (obj.poolCount = Math.round(message.poolCount));
     return obj;
   },
 
@@ -69,9 +91,30 @@ export const GenesisState = {
       ? Params.fromPartial(object.params)
       : undefined;
     message.portId = object.portId ?? "";
+    message.poolList = object.poolList?.map((e) => Pool.fromPartial(e)) || [];
+    message.poolCount = object.poolCount ?? 0;
     return message;
   },
 };
+
+declare var self: any | undefined;
+declare var window: any | undefined;
+declare var global: any | undefined;
+var globalThis: any = (() => {
+  if (typeof globalThis !== "undefined") {
+    return globalThis;
+  }
+  if (typeof self !== "undefined") {
+    return self;
+  }
+  if (typeof window !== "undefined") {
+    return window;
+  }
+  if (typeof global !== "undefined") {
+    return global;
+  }
+  throw "Unable to locate global object";
+})();
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
@@ -83,6 +126,18 @@ export type DeepPartial<T> = T extends Builtin ? T
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin ? P
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+
+function longToNumber(long: Long): number {
+  if (long.gt(Number.MAX_SAFE_INTEGER)) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  return long.toNumber();
+}
+
+if (_m0.util.Long !== Long) {
+  _m0.util.Long = Long as any;
+  _m0.configure();
+}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;
