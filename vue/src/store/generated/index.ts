@@ -1,9 +1,13 @@
 // THIS FILE IS GENERATED AUTOMATICALLY. DO NOT MODIFY.
 
+import ProtoqolBlog from './protoqol.blog'
+import ProtoqolDex from './protoqol.dex'
 import ProtoqolProtoqol from './protoqol.protoqol'
 
 
 export default { 
+  ProtoqolBlog: load(ProtoqolBlog, 'protoqol.blog'),
+  ProtoqolDex: load(ProtoqolDex, 'protoqol.dex'),
   ProtoqolProtoqol: load(ProtoqolProtoqol, 'protoqol.protoqol'),
   
 }

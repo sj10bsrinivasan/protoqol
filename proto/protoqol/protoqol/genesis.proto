@@ -3,6 +3,7 @@ package protoqol.protoqol;
 
 import "gogoproto/gogo.proto";
 import "protoqol/protoqol/params.proto";
+import "protoqol/protoqol/post.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "protoqol/x/protoqol/types";
@@ -10,5 +11,7 @@ option go_package = "protoqol/x/protoqol/types";
 // GenesisState defines the protoqol module's genesis state.
 message GenesisState {
   Params params = 1 [(gogoproto.nullable) = false];
+  repeated Post postList = 2 [(gogoproto.nullable) = false];
+  uint64 postCount = 3;
   // this line is used by starport scaffolding # genesis/proto/state
 }

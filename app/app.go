@@ -104,6 +104,12 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
+	blogmodule "protoqol/x/blog"
+	blogmodulekeeper "protoqol/x/blog/keeper"
+	blogmoduletypes "protoqol/x/blog/types"
+	dexmodule "protoqol/x/dex"
+	dexmodulekeeper "protoqol/x/dex/keeper"
+	dexmoduletypes "protoqol/x/dex/types"
 	protoqolmodule "protoqol/x/protoqol"
 	protoqolmodulekeeper "protoqol/x/protoqol/keeper"
 	protoqolmoduletypes "protoqol/x/protoqol/types"
@@ -166,6 +172,8 @@ var (
 		ica.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		protoqolmodule.AppModuleBasic{},
+		blogmodule.AppModuleBasic{},
+		dexmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -240,6 +248,10 @@ type App struct {
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
 
 	ProtoqolKeeper protoqolmodulekeeper.Keeper
+
+	BlogKeeper      blogmodulekeeper.Keeper
+	ScopedDexKeeper capabilitykeeper.ScopedKeeper
+	DexKeeper       dexmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -285,6 +297,8 @@ func New(
 		ibctransfertypes.StoreKey, icahosttypes.StoreKey, capabilitytypes.StoreKey, group.StoreKey,
 		icacontrollertypes.StoreKey,
 		protoqolmoduletypes.StoreKey,
+		blogmoduletypes.StoreKey,
+		dexmoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -510,6 +524,28 @@ func New(
 	)
 	protoqolModule := protoqolmodule.NewAppModule(appCodec, app.ProtoqolKeeper, app.AccountKeeper, app.BankKeeper)
 
+	app.BlogKeeper = *blogmodulekeeper.NewKeeper(
+		appCodec,
+		keys[blogmoduletypes.StoreKey],
+		keys[blogmoduletypes.MemStoreKey],
+		app.GetSubspace(blogmoduletypes.ModuleName),
+	)
+	blogModule := blogmodule.NewAppModule(appCodec, app.BlogKeeper, app.AccountKeeper, app.BankKeeper)
+
+	scopedDexKeeper := app.CapabilityKeeper.ScopeToModule(dexmoduletypes.ModuleName)
+	app.ScopedDexKeeper = scopedDexKeeper
+	app.DexKeeper = *dexmodulekeeper.NewKeeper(
+		appCodec,
+		keys[dexmoduletypes.StoreKey],
+		keys[dexmoduletypes.MemStoreKey],
+		app.GetSubspace(dexmoduletypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		scopedDexKeeper,
+	)
+	dexModule := dexmodule.NewAppModule(appCodec, app.DexKeeper, app.AccountKeeper, app.BankKeeper)
+
+	dexIBCModule := dexmodule.NewIBCModule(app.DexKeeper)
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Sealing prevents other modules from creating scoped sub-keepers
@@ -519,6 +555,7 @@ func New(
 	ibcRouter := ibcporttypes.NewRouter()
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
 		AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
+	ibcRouter.AddRoute(dexmoduletypes.ModuleName, dexIBCModule)
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -556,6 +593,8 @@ func New(
 		transferModule,
 		icaModule,
 		protoqolModule,
+		blogModule,
+		dexModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -586,6 +625,8 @@ func New(
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
 		protoqolmoduletypes.ModuleName,
+		blogmoduletypes.ModuleName,
+		dexmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -611,6 +652,8 @@ func New(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		protoqolmoduletypes.ModuleName,
+		blogmoduletypes.ModuleName,
+		dexmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -641,6 +684,8 @@ func New(
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		protoqolmoduletypes.ModuleName,
+		blogmoduletypes.ModuleName,
+		dexmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -671,6 +716,8 @@ func New(
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
 		protoqolModule,
+		blogModule,
+		dexModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 	app.sm.RegisterStoreDecoders()
@@ -870,6 +917,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
 	paramsKeeper.Subspace(protoqolmoduletypes.ModuleName)
+	paramsKeeper.Subspace(blogmoduletypes.ModuleName)
+	paramsKeeper.Subspace(dexmoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper

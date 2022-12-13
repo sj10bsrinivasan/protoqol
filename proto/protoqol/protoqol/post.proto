@@ -1,0 +1,11 @@
+syntax = "proto3";
+package protoqol.protoqol;
+
+option go_package = "protoqol/x/protoqol/types";
+
+message Post {
+  uint64 id = 1;
+  string title = 2; 
+  string body = 3; 
+  string creator = 4;
+}

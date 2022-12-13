@@ -7,10 +7,54 @@ import { msgTypes } from './registry';
 import { IgniteClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
+import { MsgUpdatePost } from "./types/protoqol/protoqol/tx";
+import { MsgCreatePost } from "./types/protoqol/protoqol/tx";
+import { MsgDeletePost } from "./types/protoqol/protoqol/tx";
+import { MsgWriteComment } from "./types/protoqol/protoqol/tx";
 
 
-export {  };
+export { MsgUpdatePost, MsgCreatePost, MsgDeletePost, MsgWriteComment };
 
+type sendMsgUpdatePostParams = {
+  value: MsgUpdatePost,
+  fee?: StdFee,
+  memo?: string
+};
+
+type sendMsgCreatePostParams = {
+  value: MsgCreatePost,
+  fee?: StdFee,
+  memo?: string
+};
+
+type sendMsgDeletePostParams = {
+  value: MsgDeletePost,
+  fee?: StdFee,
+  memo?: string
+};
+
+type sendMsgWriteCommentParams = {
+  value: MsgWriteComment,
+  fee?: StdFee,
+  memo?: string
+};
+
+
+type msgUpdatePostParams = {
+  value: MsgUpdatePost,
+};
+
+type msgCreatePostParams = {
+  value: MsgCreatePost,
+};
+
+type msgDeletePostParams = {
+  value: MsgDeletePost,
+};
+
+type msgWriteCommentParams = {
+  value: MsgWriteComment,
+};
 
 
 export const registry = new Registry(msgTypes);
@@ -30,6 +74,94 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 
   return {
 		
+		async sendMsgUpdatePost({ value, fee, memo }: sendMsgUpdatePostParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgUpdatePost: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgUpdatePost({ value: MsgUpdatePost.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgUpdatePost: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		async sendMsgCreatePost({ value, fee, memo }: sendMsgCreatePostParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgCreatePost: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgCreatePost({ value: MsgCreatePost.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgCreatePost: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		async sendMsgDeletePost({ value, fee, memo }: sendMsgDeletePostParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgDeletePost: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgDeletePost({ value: MsgDeletePost.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgDeletePost: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		async sendMsgWriteComment({ value, fee, memo }: sendMsgWriteCommentParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgWriteComment: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgWriteComment({ value: MsgWriteComment.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgWriteComment: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
+		
+		msgUpdatePost({ value }: msgUpdatePostParams): EncodeObject {
+			try {
+				return { typeUrl: "/protoqol.protoqol.MsgUpdatePost", value: MsgUpdatePost.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgUpdatePost: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgCreatePost({ value }: msgCreatePostParams): EncodeObject {
+			try {
+				return { typeUrl: "/protoqol.protoqol.MsgCreatePost", value: MsgCreatePost.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgCreatePost: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgDeletePost({ value }: msgDeletePostParams): EncodeObject {
+			try {
+				return { typeUrl: "/protoqol.protoqol.MsgDeletePost", value: MsgDeletePost.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgDeletePost: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgWriteComment({ value }: msgWriteCommentParams): EncodeObject {
+			try {
+				return { typeUrl: "/protoqol.protoqol.MsgWriteComment", value: MsgWriteComment.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgWriteComment: Could not create message: ' + e.message)
+			}
+		},
 		
 	}
 };
