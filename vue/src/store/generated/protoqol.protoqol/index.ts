@@ -192,16 +192,16 @@ export default {
 		},
 		
 		
-		async sendMsgDeletePost({ rootGetters }, { value, fee = [], memo = '' }) {
+		async sendMsgWriteComment({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
-				const result = await client.ProtoqolProtoqol.tx.sendMsgDeletePost({ value, fee: {amount: fee, gas: "200000"}, memo })
+				const result = await client.ProtoqolProtoqol.tx.sendMsgWriteComment({ value, fee: {amount: fee, gas: "200000"}, memo })
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeletePost:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgWriteComment:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgDeletePost:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgWriteComment:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -218,16 +218,16 @@ export default {
 				}
 			}
 		},
-		async sendMsgWriteComment({ rootGetters }, { value, fee = [], memo = '' }) {
+		async sendMsgDeletePost({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
-				const result = await client.ProtoqolProtoqol.tx.sendMsgWriteComment({ value, fee: {amount: fee, gas: "200000"}, memo })
+				const result = await client.ProtoqolProtoqol.tx.sendMsgDeletePost({ value, fee: {amount: fee, gas: "200000"}, memo })
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgWriteComment:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgDeletePost:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgWriteComment:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgDeletePost:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -245,16 +245,16 @@ export default {
 			}
 		},
 		
-		async MsgDeletePost({ rootGetters }, { value }) {
+		async MsgWriteComment({ rootGetters }, { value }) {
 			try {
 				const client=initClient(rootGetters)
-				const msg = await client.ProtoqolProtoqol.tx.msgDeletePost({value})
+				const msg = await client.ProtoqolProtoqol.tx.msgWriteComment({value})
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeletePost:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgWriteComment:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgDeletePost:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgWriteComment:Create Could not create message: ' + e.message)
 				}
 			}
 		},
@@ -271,16 +271,16 @@ export default {
 				}
 			}
 		},
-		async MsgWriteComment({ rootGetters }, { value }) {
+		async MsgDeletePost({ rootGetters }, { value }) {
 			try {
 				const client=initClient(rootGetters)
-				const msg = await client.ProtoqolProtoqol.tx.msgWriteComment({value})
+				const msg = await client.ProtoqolProtoqol.tx.msgDeletePost({value})
 				return msg
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgWriteComment:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgDeletePost:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgWriteComment:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgDeletePost:Create Could not create message: ' + e.message)
 				}
 			}
 		},

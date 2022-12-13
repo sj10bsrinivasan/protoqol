@@ -196,19 +196,6 @@ export default {
 		},
 		
 		
-		async sendMsgDeletePool({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const client=await initClient(rootGetters)
-				const result = await client.ProtoqolDex.tx.sendMsgDeletePool({ value, fee: {amount: fee, gas: "200000"}, memo })
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeletePool:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgDeletePool:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
 		async sendMsgUpdatePool({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
@@ -235,6 +222,19 @@ export default {
 				}
 			}
 		},
+		async sendMsgDeletePool({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const client=await initClient(rootGetters)
+				const result = await client.ProtoqolDex.tx.sendMsgDeletePool({ value, fee: {amount: fee, gas: "200000"}, memo })
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgDeletePool:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgDeletePool:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
 		async sendMsgAddLiquidity({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
@@ -249,19 +249,6 @@ export default {
 			}
 		},
 		
-		async MsgDeletePool({ rootGetters }, { value }) {
-			try {
-				const client=initClient(rootGetters)
-				const msg = await client.ProtoqolDex.tx.msgDeletePool({value})
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgDeletePool:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgDeletePool:Create Could not create message: ' + e.message)
-				}
-			}
-		},
 		async MsgUpdatePool({ rootGetters }, { value }) {
 			try {
 				const client=initClient(rootGetters)
@@ -285,6 +272,19 @@ export default {
 					throw new Error('TxClient:MsgCreatePool:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgCreatePool:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgDeletePool({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.ProtoqolDex.tx.msgDeletePool({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgDeletePool:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgDeletePool:Create Could not create message: ' + e.message)
 				}
 			}
 		},
